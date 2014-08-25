@@ -3,6 +3,11 @@
 <%end%>
 
 <h1>Your Pragmatic Catalog</h1>
+	<% if !session[:count_entrance].nil? && session[:count_entrance] > 5 %>
+	  <span id="counter-entrance">
+	  <%= "#{ counter } " %>
+	  </span>
+	<% end %>
 
 <% cache ['store', Product.latest] do %>
 	<% @products.each do |product|%>
@@ -13,6 +18,7 @@
 				<%= sanitize(product.description) %>
 				<div class="price_line">
 					<span class="price"><%= number_to_currency( product.price ) %></span>
+					<%= button_to 'Add to Cart', line_items_path+"?product_id=#{product.id}" %>
 				</div>
 			</div>
 		<%end%>
