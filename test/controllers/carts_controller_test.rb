@@ -25,8 +25,14 @@ class CartsControllerTest < ActionController::TestCase
   end
 
   test "should show cart" do
+    @cart.add_product products(:one)
+    @cart.save
+
+    session[:cart_id] = @cart.id
     get :show, id: @cart
     assert_response :success
+    
+    assert_select '#del-button'
   end
 
   test "should get edit" do
@@ -41,9 +47,10 @@ class CartsControllerTest < ActionController::TestCase
 
   test "should destroy cart" do
     assert_difference('Cart.count', -1) do
+      session[:cart_id] = @cart.id
       delete :destroy, id: @cart
     end
 
-    assert_redirected_to carts_path
+    assert_redirected_to store_url
   end
 end

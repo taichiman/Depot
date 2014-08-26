@@ -33,6 +33,8 @@ end
 group :development, :test do
   gem 'pry-byebug'
   gem 'jazz_hands'
+  # gem "better_errors"
+  # gem "binding_of_caller"
 end
 
 # Use ActiveModel has_secure_password
