@@ -1,7 +1,5 @@
 one:
-  product_id: 
-  cart_id: 
-
-two:
-  product_id: 
-  cart_id: 
+  product: ruby
+  cart:    one
+  quantity:   1
+  price:      10.20

@@ -53,4 +53,25 @@ class CartsControllerTest < ActionController::TestCase
 
     assert_redirected_to store_url
   end
+
+  # === my tests 
+  
+  test "should hide cart if there are no products in the cart" do
+    @cart.line_items.delete_all
+    assert_equal @cart.line_items.count, 0
+    
+    get :index, {}, cart_id: @cart.id
+
+    assert_response :success
+    assert_select '#cart[style*=none]'
+  end
+
+  test "should show cart if there are products in the cart" do
+    assert_equal 1, @cart.line_items.count
+    get :index, {}, cart_id: @cart.id
+
+    assert_response :success
+    assert_select '#cart'
+    assert_select '#cart[style=display:none;]', 0
+  end
 end

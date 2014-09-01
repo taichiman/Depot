@@ -13,6 +13,9 @@
 	</div>
 	<div id="columns">
 		<div id="side">
+			<%= hidden_div_if( @cart.try(:line_items).try(:empty?), id: "cart" ) do %>
+				<%= render @cart if @cart %>
+			<% end %>
 			<ul>
 				<li><a href="http://localhost:3000">Home</a></li>
 				<li><a href="http://localhost:3000/faq">Questions</a></li>

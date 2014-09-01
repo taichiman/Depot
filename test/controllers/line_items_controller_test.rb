@@ -3,6 +3,7 @@ require 'test_helper'
 class LineItemsControllerTest < ActionController::TestCase
   setup do
     @line_item = line_items(:one)
+    @cart = carts(:one)
   end
 
   test "should get index" do
@@ -21,7 +22,18 @@ class LineItemsControllerTest < ActionController::TestCase
       post :create, product_id: products(:ruby).id
     end
 
-    assert_redirected_to cart_path(assigns(:line_item).cart)
+    assert_redirected_to store_path
+  end
+
+  test "shoul create line_item via ajax" do
+    assert_difference "LineItem.count" do
+      xhr :post, :create, product_id: products(:ruby).id 
+    end
+
+    assert_response :success
+    assert_select_jquery :html, '#cart' do
+      assert_select 'tr#current_item td', /Programming Ruby 1.9/
+    end
   end
 
   test "should show line_item" do
@@ -45,5 +57,43 @@ class LineItemsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to store_path
+  end
+
+  # === my tests
+
+  test "should add product to cart when cart is showing" do
+    @cart.line_items.delete_all
+    session[:cart_id] = @cart.id
+
+    assert_difference( '@cart.line_items.count', 2 ) do
+      xhr :post, :create, { product_id: products(:one).id }
+      xhr :post, :create, { product_id: products(:ruby).id }
+    end
+
+    assert_response :success
+    assert_select_jquery :html, '#cart' do
+      assert_select 'tr', 3
+    end
+  end
+
+  test "should decrement quantity of product" do
+    @cart.line_items.first.increment! :quantity
+    session[:cart_id] = @cart.id
+
+    assert_difference('@cart.line_items.first.quantity', -1) do
+      xhr :post, :decrement, { id: @cart.line_items.first.id }
+    end
+
+    assert_match /1 &times;/, response.body
+  end
+
+  test "should destroy a line item if quantity eq 0" do
+    session[:cart_id] = @cart.id
+
+    assert_difference('@cart.line_items.count', -1) do
+      xhr :post, :decrement, { id: @cart.line_items.first.id }
+    end
+
+    assert_no_match /1 &times;/, response.body
   end
 end
